@@ -1,0 +1,74 @@
+<div class="p-3" align="center">
+    <div class="card p-3">
+        <div class="row">
+            <div class="col-md-12">
+                <label style="font-size:xx-large;color: grey;"><b>Register</b></label>
+            </div>
+            <div class="col-md-12 mb-2">
+                <div>
+                    <div class="mrg5-r" style="text-align: center;">
+                        <div style="position:relative;width:fit-content;display:inline-block;">
+                            <img id="showPic" src="{{srcProfile}}" class="rounded-circle pic-fix">
+                            <div style="z-index:2;position:absolute;bottom:0px;right:0px;">
+                                <i class="fa fa-camera" style="color:gray;cursor: pointer;" (click)="chootFile()"></i>
+                                <input id="upPicPro" name="upPicPro" class="picPro" type="file" accept="image/gif, image/jpeg, image/png" (change)="changeProfile($event)" hidden>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12" align="left">
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text wd150">Username :</span>
+                    </div>
+                    <input type="text" placeholder="(A-Z, a-z, 0-9, _) ความยาวไม่เกิน 12 ตัวอักษร" maxlength=" 12 " class="form-control" (keypress)="checkUsername($event)">
+                    <div class="input-group-append " [hidden]="!checkLength ">
+                        <button class="input-group-text " (click)="showPass() "><i class="fa {{eye}} "></i></button>
+                    </div>
+                </div>
+                <div class="input-group mb-2 ">
+                    <div class="input-group-prepend ">
+                        <span class="input-group-text wd150 ">Password : </span>
+                    </div>
+                    <input type="{{psType}}" value="{{psGen}}" class="form-control {{bCol1}}" (focusout)="checkPassword($any($event.target).value)">
+                    <div class="input-group-append ">
+                        <button class="input-group-text " (click)="showPass() "><i class="fa {{eye}}"></i></button>
+                    </div>
+                </div>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text wd150">Re-Password : <i class="fa fa-times" style="color: red;" [hidden]="checkRePass"></i> </span>
+                    </div>
+                    <input type="{{psType2}}" value="{{psGen}}" class="form-control {{bCol2}}" (focusout)="checkRePassword($any($event.target).value)">
+                    <div class="input-group-append">
+                        <button class="input-group-text" (click)="showPass2()"><i class="fa {{eye2}}"></i></button>
+                    </div>
+                </div>
+                <div>
+                    <span style="color: red;font-size: 9pt;" [hidden]="checkRePass">Password ไม่ตรงกัน</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <label style="color:grey;"><b>Personal Data</b></label>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text wd150">Firstname :</span>
+                    </div>
+                    <input type="text" class="form-control" value="{{fName}}" (input)="toUpperF($any($event.target).value)">
+                </div>
+                <div class=" input-group mb-2 ">
+                    <div class="input-group-prepend ">
+                        <span class="input-group-text wd150 ">Lastname :</span>
+                    </div>
+                    <input type="text " class="form-control " value="{{lName}}" (input)="toUpperL($any($event.target).value)">
+                </div>
+            </div>
+            <div class="col-md-6 ">
+                <button class="btn btn-success form-control mt-2 "><i class="fa fa-floppy-o"></i> Save </button>
+            </div>
+            <div class="col-md-6 ">
+                <button class="btn btn-danger form-control mt-2 " routerLink="/"><i class="fa fa-arrow-left"></i> Back </button>
+            </div>
+        </div>
+    </div>
+</div>
