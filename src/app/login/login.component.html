@@ -6,24 +6,21 @@
             </div>
             <div class="col-md-12">
                 <div class="input-group">
-                    <input type="text" class="form-control mt-3" placeholder="Username">
+                    <input type="text" id="username" class="form-control mt-3" placeholder="Username">
                 </div>
                 <div class="input-group">
-                    <input class="form-control mt-3" type="{{psType}}" placeholder="Password">
+                    <input class="form-control mt-3" id="password" [type]="psType" placeholder="Password">
                     <div class="input-group-append">
                         <button class="input-group-text mt-3" (click)="showPass()"><i class="fa {{eye}}"></i></button>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <button class="btn btn-primary form-control mt-2" routerLink="/profile"><i class="fa fa-sign-in"></i> Login </button>
+                <button class="btn btn-primary form-control mt-2" (click)="processLogin()"><i class="fa fa-sign-in"></i> Login </button>
             </div>
             <div class="col-md-6">
                 <button class="btn btn-info form-control mt-2" routerLink="/register"><i class="fa fa-id-badge"></i> Register </button>
             </div>
         </div>
     </div>
-</div>
-<div id="showSpace">
-
 </div>
