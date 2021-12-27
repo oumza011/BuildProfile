@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+const resizebase64 = require('resize-base64');
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
-  fileToUpload: File | null = null;
+  fileToUpload = '';
   psGen = '';
   eye = "fa-eye-slash";
   eye2 = "fa-eye-slash";
@@ -109,20 +110,22 @@ export class RegisterComponent {
   chootFile() {
     document.getElementById("upPicPro")?.click();
   }
-  uploadFile(e:any) {
-    console.log(e);
-    this.http.post('http://localhost:3000/upload',e).subscribe(result =>{
-    console.log(result);
-    });
+  uploadFile(x: any) {
+    var data = this.fileToUpload;
+    let base64String = resizebase64(data,150,150);
+    let base64Image = { base64: base64String.split(';base64,').pop(), names: x };
+    this.http.post<any>('http://localhost:3000/upload', base64Image).subscribe(result => {
+      if(result == 'success'){
+        alert('บันทึกสำเร็จ');
+      }
+    })
   }
   changeProfile(e: any) {
-    console.log(e.target.files[0]);
-    this.fileToUpload = e.target.files[0];
-    // this.uploadFile(this.fileToUpload);
     if (e.target.files && e.target.files[0]) {
       var reader = new FileReader();
       reader.onload = (event: any) => {
         this.srcProfile = event.target.result;
+        this.fileToUpload = event.target.result;
       }
       reader.readAsDataURL(e.target.files[0]);
     }
@@ -176,6 +179,9 @@ export class RegisterComponent {
     // console.log(data);
     this.http.post<any>('http://localhost:3000/register', data).subscribe(result => {
       if(result.result == "Success"){
+        if(pic_profile != ''){
+          this.uploadFile(pic_profile);
+        }
         alert('ลงทะเบียนสำเร็จ!!');
       }else{
         alert('Register Faild!!');

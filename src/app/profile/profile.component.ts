@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ShareService } from '../service/share.service';
 const md5 = require('md5');
+const resizebase64 = require('resize-base64');
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
@@ -10,7 +11,7 @@ const md5 = require('md5');
 })
 export class ProfileComponent implements OnInit {
   constructor(public router: Router, private http: HttpClient, private share: ShareService) { }
-  fileToUpload: File | null = null;
+  fileToUpload = '';
   eye0 = "fa-eye-slash";
   eye1 = "fa-eye-slash";
   eye2 = "fa-eye-slash";
@@ -46,7 +47,6 @@ export class ProfileComponent implements OnInit {
       if (result.length == 0) {
         this.router.navigate(['/']);
       } else {
-        // console.log(result);
         this.userName = result[0].username
         this.fName = result[0].fname;
         this.lName = result[0].lname;
@@ -61,7 +61,6 @@ export class ProfileComponent implements OnInit {
   reloadProfile() {
     this.http.post<any>('http://localhost:3000/login', this.share.shareDataLogin).subscribe(result => {
       if (result.length == 0) {
-        // this.router.navigate(['/']);
       } else {
         this.router.navigate(['/']);
         this.userName = result[0].username
@@ -81,11 +80,14 @@ export class ProfileComponent implements OnInit {
       }
     })
   }
-  uploadFile(){
+  uploadFile(x: any) {
     var data = this.fileToUpload;
-    this.http.post<any>('http://localhost:3000/upload', data).subscribe(result => {
-      console.log(result);
-
+    let base64String = resizebase64(data,150,150);
+    let base64Image = { base64: base64String.split(';base64,').pop(), names: x };
+    this.http.post<any>('http://localhost:3000/upload', base64Image).subscribe(result => {
+      if(result == 'success'){
+        alert('บันทึกสำเร็จ');
+      }
     })
   }
   updateProfile() {
@@ -135,13 +137,13 @@ export class ProfileComponent implements OnInit {
         this.checknewPass = true;
       }
     }
-    if(this.checkRePass){
+    if (this.checkRePass) {
       count = 1;
     }
-    if(this.checknewPass){
+    if (this.checknewPass) {
       count = 1;
     }
-    if(this.checkOldPass){
+    if (this.checkOldPass) {
       count = 1;
     }
     if (data.fname == '') {
@@ -154,19 +156,21 @@ export class ProfileComponent implements OnInit {
     }
     if (count == 0) {
       this.http.post<any>('http://localhost:3000/updateprofile', data).subscribe(result => {
-        if(result.result == 'failed' ){
+        if (result.result == 'failed') {
           this.checkerr = true;
-        }else
-        if(result.result == '777'){
-          this.checkdubPass = true;
-        }else if(result.result =="failed read"){}else{
-          this.uploadFile();
-          this.reloadProfile();
-          this.flagEditPasst = false;
-          this.flagEdit = false;
-          this.srcProfile = this.srcProfileOld;
-          this.inputControl = "inp-bh";
-        }
+        } else
+          if (result.result == '777') {
+            this.checkdubPass = true;
+          } else if (result.result == "failed read") { } else {
+            if(pic_profile != ''){
+              this.uploadFile(pic_profile);
+            }
+            this.reloadProfile();
+            this.flagEditPasst = false;
+            this.flagEdit = false;
+            this.srcProfile = this.srcProfileOld;
+            this.inputControl = "inp-bh";
+          }
       })
     } else {
     }
@@ -230,9 +234,7 @@ export class ProfileComponent implements OnInit {
   checkOldPassword(event: any) {
 
     if (event == this.oldPassword) {
-      // this.bCol0 = '';
     } else {
-      // this.bCol0 = 'bg-red';
     }
   }
   checkPassword(event: any) {
@@ -267,12 +269,12 @@ export class ProfileComponent implements OnInit {
     document.getElementById("upPicPro")?.click();
   }
   changeProfile(e: any) {
-    // this.fileToUpload = e.target.files[0];
     if (e.target.files && e.target.files[0]) {
       var reader = new FileReader();
       reader.onload = (event: any) => {
         this.srcProfile = event.target.result;
-        this.fileToUpload = event.target.result
+        this.fileToUpload = event.target.result;
+
       }
       reader.readAsDataURL(e.target.files[0]);
     }
@@ -294,6 +296,7 @@ export class ProfileComponent implements OnInit {
   flagEditPass() {
     this.flagEditPasst = true;
   }
+
   cancelEditPass() {
     this.flagEditPasst = false;
     (<HTMLInputElement>document.getElementById("newpass")).value = '';
@@ -312,4 +315,5 @@ export class ProfileComponent implements OnInit {
     this.eye1 = "fa-eye-slash";
     this.eye2 = "fa-eye-slash";
   }
+
 }

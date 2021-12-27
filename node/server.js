@@ -6,6 +6,7 @@ require('./db');
 const newProfileModel = require('./new_profile_schema');
 const { param } = require('jquery');
 const fs = require('fs');
+var resizebase64 = require('resize-base64');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
@@ -29,10 +30,9 @@ app.get('/checkuser', (req, res) => {
     })
 })
 app.post('/upload', (req, res) => {
-    // console.log(req.query);
-    fs.writeFile('./src/assets/img/mynewfile3.png', req, function(err) {
+    fs.writeFile('./src/assets/img/' + req.body.names, req.body.base64, { encoding: 'base64' }, function(err) {
         if (err) res.json({ result: req });
-        res.json({ result: req });
+        res.json({ result: "success" });
     });
 })
 app.post('/login', (req, res) => {

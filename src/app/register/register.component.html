@@ -8,7 +8,7 @@
                 <div>
                     <div class="mrg5-r" style="text-align: center;">
                         <div style="position:relative;width:fit-content;display:inline-block;">
-                            <img id="showPic" src="{{srcProfile}}" class="rounded-circle pic-fix">
+                            <img id="showPic" src="{{srcProfile}}" class="rounded-circle pic-fix" style="border: 2px solid rgb(86, 154, 255);">
                             <div style="z-index:2;position:absolute;bottom:0px;right:0px;">
                                 <i class="fa fa-camera" style="color:gray;cursor: pointer;" (click)="chootFile()"></i>
                                 <input id="upPicPro" name="upPicPro" class="picPro" type="file" accept="image/gif, image/jpeg, image/png" (change)="changeProfile($event)" hidden>
