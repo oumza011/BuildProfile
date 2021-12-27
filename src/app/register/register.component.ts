@@ -7,6 +7,8 @@ const resizebase64 = require('resize-base64');
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+  alertSuccess = false;
+  alertFailed = false;
   fileToUpload = '';
   psGen = '';
   eye = "fa-eye-slash";
@@ -182,9 +184,16 @@ export class RegisterComponent {
         if(pic_profile != ''){
           this.uploadFile(pic_profile);
         }
-        alert('ลงทะเบียนสำเร็จ!!');
+        this.alertSuccess = true;
+            setTimeout(() => {
+              this.alertSuccess = false;
+            }, 3000);
+
       }else{
-        alert('Register Faild!!');
+        this.alertFailed = true;
+            setTimeout(() => {
+              this.alertFailed = false;
+            }, 3000);
       }
       alert(JSON.stringify(result));
 

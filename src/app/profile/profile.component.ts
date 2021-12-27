@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ShareService } from '../service/share.service';
@@ -11,6 +11,8 @@ const resizebase64 = require('resize-base64');
 })
 export class ProfileComponent implements OnInit {
   constructor(public router: Router, private http: HttpClient, private share: ShareService) { }
+  alertSuccess = false;
+  alertFailed = false;
   fileToUpload = '';
   eye0 = "fa-eye-slash";
   eye1 = "fa-eye-slash";
@@ -158,6 +160,10 @@ export class ProfileComponent implements OnInit {
       this.http.post<any>('http://localhost:3000/updateprofile', data).subscribe(result => {
         if (result.result == 'failed') {
           this.checkerr = true;
+          this.alertFailed = true;
+            setTimeout(() => {
+              this.alertFailed = false;
+            }, 3000);
         } else
           if (result.result == '777') {
             this.checkdubPass = true;
@@ -165,6 +171,10 @@ export class ProfileComponent implements OnInit {
             if(pic_profile != ''){
               this.uploadFile(pic_profile);
             }
+            this.alertSuccess = true;
+            setTimeout(() => {
+              this.alertSuccess = false;
+            }, 3000);
             this.reloadProfile();
             this.flagEditPasst = false;
             this.flagEdit = false;
@@ -315,5 +325,4 @@ export class ProfileComponent implements OnInit {
     this.eye1 = "fa-eye-slash";
     this.eye2 = "fa-eye-slash";
   }
-
 }
