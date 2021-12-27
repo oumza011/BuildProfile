@@ -1,11 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
-
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { ShareService } from '../service/share.service';
+const md5 = require('md5');
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit {
+  constructor(public router: Router, private http: HttpClient, private share: ShareService) { }
+  fileToUpload: File | null = null;
   eye0 = "fa-eye-slash";
   eye1 = "fa-eye-slash";
   eye2 = "fa-eye-slash";
@@ -15,32 +20,175 @@ export class ProfileComponent {
   bCol0 = '';
   bCol1 = '';
   bCol2 = '';
-  userName = "oumod011";
-  fName = "Prawut";
-  lName = "Kunkaew";
-  fNameold = "Prawut";
-  lNameold = "Kunkaew";
+  userName = "";
+  fName = "";
+  lName = "";
+  fNameold = "";
+  lNameold = "";
   flagEdit = false;
   flagEditPasst = false;
   inputControl = "inp-bh";
   switchInput = false;
-  oldPassword = "asd123";
+  checkOldPass = false;
+  checknewPass = false;
+  checkRePass = false;
+  oldPassword = "";
   password = "";
-  checkRePass = true;
-  srcProfile = "assets/img/profile-img-1.jpg";
-  srcProfileOld = "assets/img/profile-img-1.jpg";
+  srcProPart = "assets/img/";
+  srcProfile = "";
+  srcProfileOld = "";
+  checkfname = false;
+  checklname = false;
+  checkdubPass = false;
+  checkerr = false;
+  ngOnInit(): void {
+    this.http.post<any>('http://localhost:3000/login', this.share.shareDataLogin).subscribe(result => {
+      if (result.length == 0) {
+        this.router.navigate(['/']);
+      } else {
+        // console.log(result);
+        this.userName = result[0].username
+        this.fName = result[0].fname;
+        this.lName = result[0].lname;
+        this.fNameold = result[0].fname;
+        this.lNameold = result[0].lname;
+        this.oldPassword = result[0].password;
+        this.srcProfile = this.srcProPart + result[0].pic_profile;
+        this.srcProfileOld = this.srcProPart + result[0].pic_profile;
+      }
+    })
+  }
+  reloadProfile() {
+    this.http.post<any>('http://localhost:3000/login', this.share.shareDataLogin).subscribe(result => {
+      if (result.length == 0) {
+        // this.router.navigate(['/']);
+      } else {
+        this.router.navigate(['/']);
+        this.userName = result[0].username
+        this.fName = result[0].fname;
+        this.lName = result[0].lname;
+        this.fNameold = result[0].fname;
+        this.lNameold = result[0].lname;
+        this.oldPassword = result[0].password;
+        this.srcProfile = this.srcProPart + result[0].pic_profile;
+        this.srcProfileOld = this.srcProPart + result[0].pic_profile;
+        this.checkfname = false;
+        this.checklname = false;
+        this.flagEditPasst = false;
+        this.flagEdit = false;
+        this.checkerr = false;
+        this.router.navigate(['/profile']);
+      }
+    })
+  }
+  uploadFile(){
+    var data = this.fileToUpload;
+    this.http.post<any>('http://localhost:3000/upload', data).subscribe(result => {
+      console.log(result);
+
+    })
+  }
+  updateProfile() {
+    this.checkdubPass = false;
+    var username = this.userName;
+    var password = (<HTMLInputElement>document.getElementById("newpass")).value;
+    var repassword = (<HTMLInputElement>document.getElementById("renewpass")).value;
+    var oldPassword = (<HTMLInputElement>document.getElementById("oldpass")).value;
+    var fname = (<HTMLInputElement>document.getElementById("fname")).value;
+    var lname = (<HTMLInputElement>document.getElementById("lname")).value;
+    var filepart = (<HTMLInputElement>document.getElementById("upPicPro")).value;
+    var filename = filepart.split("\\");
+    var pic_profile = "";
+    if (filepart == '') {
+      var pic_profile = "";
+    } else {
+      var pic_profile = filename[2];
+    }
+    var count = 0;
+    let data = {
+      "username": username,
+      "password": password,
+      "oldPassword": oldPassword,
+      "fname": fname,
+      "lname": lname,
+      "pic_profile": pic_profile,
+    };
+    if (oldPassword != '') {
+      if (md5(oldPassword) != this.oldPassword) {
+        count = 1;
+        this.checkOldPass = true;
+      }
+    }
+    if ((password == '') && (repassword == '') && (oldPassword == '')) {
+
+    } else if ((password != '') && (repassword != '') && (oldPassword != '')) {
+
+    } else {
+      count = 1;
+      if (oldPassword == '') {
+        this.checkOldPass = true;
+      }
+      if (repassword == '') {
+        this.checkRePass = true;
+      }
+      if (password == '') {
+        this.checknewPass = true;
+      }
+    }
+    if(this.checkRePass){
+      count = 1;
+    }
+    if(this.checknewPass){
+      count = 1;
+    }
+    if(this.checkOldPass){
+      count = 1;
+    }
+    if (data.fname == '') {
+      count = 1;
+      this.checkfname = true;
+    }
+    if (data.lname == '') {
+      count = 1;
+      this.checklname = true;
+    }
+    if (count == 0) {
+      this.http.post<any>('http://localhost:3000/updateprofile', data).subscribe(result => {
+        if(result.result == 'failed' ){
+          this.checkerr = true;
+        }else
+        if(result.result == '777'){
+          this.checkdubPass = true;
+        }else if(result.result =="failed read"){}else{
+          this.uploadFile();
+          this.reloadProfile();
+          this.flagEditPasst = false;
+          this.flagEdit = false;
+          this.srcProfile = this.srcProfileOld;
+          this.inputControl = "inp-bh";
+        }
+      })
+    } else {
+    }
+  }
   openEditFrofile() {
     this.flagEdit = true;
     this.inputControl = "form-control";
     this.switchInput = true;
   }
   cancelEditFrofile() {
+    (<HTMLInputElement>document.getElementById("fname")).value = this.fNameold;
+    (<HTMLInputElement>document.getElementById("lname")).value = this.lNameold;
+    this.fName = this.fNameold;
+    this.lName = this.lNameold;
+    this.checkfname = false;
+    this.checklname = false;
     this.flagEditPasst = false;
     this.flagEdit = false;
     this.srcProfile = this.srcProfileOld;
     this.inputControl = "inp-bh";
-    this.fName = this.fNameold;
-    this.lName = this.lNameold;
+    this.cancelEditPass()
+
   }
   showPass0() {
     if (this.eye0 == "fa-eye-slash") {
@@ -70,50 +218,67 @@ export class ProfileComponent {
       this.psType2 = "password";
     }
   }
-  checkOldPassword(event: any){
+  resetAlertOldPass() {
+    this.checkOldPass = false;
+  }
+  resetAlertNewPass() {
+    this.checknewPass = false;
+  }
+  resetAlertReNewPass() {
+    this.checkRePass = false;
+  }
+  checkOldPassword(event: any) {
+
     if (event == this.oldPassword) {
-      this.bCol0 = '';
+      // this.bCol0 = '';
     } else {
-      this.bCol0 = 'bg-red';
+      // this.bCol0 = 'bg-red';
     }
   }
   checkPassword(event: any) {
     if (event.length >= 6) {
       if (event.match(/([a-zA-Z])/) && event.match(/([0-9])/)) {
         this.bCol1 = '';
+        this.checknewPass = false;
         this.password = event;
       } else {
         this.bCol1 = 'bg-red';
+        this.checknewPass = true;
       }
     } else if (event.length == 0) {
       this.bCol1 = '';
+      this.checknewPass = false;
       this.password = event;
     } else {
       this.bCol1 = 'bg-red';
+      this.checknewPass = true;
     }
   }
   checkRePassword(event: any) {
     if (event == this.password) {
       this.bCol2 = '';
-      this.checkRePass = true;
+      this.checkRePass = false;
     } else {
       this.bCol2 = 'bg-red';
-      this.checkRePass = false;
+      this.checkRePass = true;
     }
   }
   chootFile() {
     document.getElementById("upPicPro")?.click();
   }
   changeProfile(e: any) {
+    // this.fileToUpload = e.target.files[0];
     if (e.target.files && e.target.files[0]) {
       var reader = new FileReader();
       reader.onload = (event: any) => {
         this.srcProfile = event.target.result;
+        this.fileToUpload = event.target.result
       }
       reader.readAsDataURL(e.target.files[0]);
     }
   }
   toUpperF(e: any) {
+    this.checkfname = false;
     if (e.length != 0) {
       this.fName = e[0].toUpperCase() + e.substring(1);
 
@@ -121,14 +286,30 @@ export class ProfileComponent {
 
   }
   toUpperL(e: any) {
+    this.checklname = false;
     if (e.length != 0) {
       this.lName = e[0].toUpperCase() + e.substring(1);
     }
   }
-  flagEditPass(){
+  flagEditPass() {
     this.flagEditPasst = true;
   }
-  cancelEditPass(){
+  cancelEditPass() {
     this.flagEditPasst = false;
+    (<HTMLInputElement>document.getElementById("newpass")).value = '';
+    (<HTMLInputElement>document.getElementById("renewpass")).value = '';
+    (<HTMLInputElement>document.getElementById("oldpass")).value = '';
+    this.psType0 = "password";
+    this.psType1 = "password";
+    this.psType2 = "password";
+    this.bCol0 = '';
+    this.bCol1 = '';
+    this.bCol2 = '';
+    this.checkOldPass = false;
+    this.checknewPass = false;
+    this.checkRePass = false;
+    this.eye0 = "fa-eye-slash";
+    this.eye1 = "fa-eye-slash";
+    this.eye2 = "fa-eye-slash";
   }
 }

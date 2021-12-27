@@ -7,7 +7,7 @@ import { RegisterComponent } from './register/register.component';
 import { ProfileComponent } from './profile/profile.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
-
+import {HttpClientModule} from '@angular/common/http'
 @NgModule({
   declarations: [
     AppComponent,
@@ -24,6 +24,7 @@ import { RouterModule } from '@angular/router';
       {path: 'register', component: RegisterComponent},
       {path: 'profile', component: ProfileComponent},
     ]),
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
